@@ -5,6 +5,7 @@ import { ConcatSource } from 'webpack-sources';
 import async from 'async';
 import loaderUtils from 'loader-utils';
 import validateOptions from 'schema-utils';
+import mkdirp from 'mkdirp';
 import ExtractTextPluginCompilation from './lib/ExtractTextPluginCompilation';
 import OrderUndefinedError from './lib/OrderUndefinedError';
 import {
@@ -195,6 +196,10 @@ class ExtractTextPlugin {
         });
       });
       compilation.plugin('additional-assets', (callback) => {
+        // 定义输出位置
+        const outputPath = options.outputTemplatePath || 'template/style';
+        mkdirp.sync(outputPath);
+
         extractedChunks.forEach((extractedChunk) => {
           if (extractedChunk.getNumberOfModules()) {
             extractedChunk.sortModules((a, b) => {
@@ -217,6 +222,15 @@ class ExtractTextPlugin {
 
             compilation.assets[file] = source;
             chunk.files.push(file);
+            try {
+              // eslint-disable-next-line no-underscore-dangle
+              fs.writeFileSync(path.resolve(outputPath, `${chunk.name}.pug`), `style(type="text/css").\r\n  ${source.children.map(item => item._value).join('')}`);
+              // eslint-disable-next-line no-console
+              console.log(`${chunk.name} write successfully`);
+            } catch (exp) {
+              // eslint-disable-next-line no-console
+              console.log(exp);
+            }
           }
         }, this);
         callback();

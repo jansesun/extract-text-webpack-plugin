@@ -22,6 +22,10 @@
         "type": ["string", "function"]
       }
     },
+    "outputTemplatePath": {
+      "description": "The outputTemplatePath that ExtractTextPlugin will extract to",
+      "type": "string"
+    },
     "ignoreOrder": {
       "description": "Ignore dependency order (useful for CSS Modules)",
       "type": "boolean"
